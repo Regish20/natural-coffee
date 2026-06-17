@@ -20,22 +20,37 @@ const whatsappNumber = "51999999999";
 let currentPrice = 0;
 let currentQuantity = 1;
 
+function setMenuState(isOpen) {
+  menuButton.setAttribute("aria-expanded", String(isOpen));
+  menuButton.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+  navigation.classList.toggle("open", isOpen);
+  document.body.classList.toggle("menu-open", isOpen);
+}
+
 function closeMenu() {
-  menuButton.setAttribute("aria-expanded", "false");
-  menuButton.setAttribute("aria-label", "Abrir menú");
-  navigation.classList.remove("open");
-  document.body.classList.remove("menu-open");
+  setMenuState(false);
 }
 
 menuButton.addEventListener("click", () => {
   const isOpen = menuButton.getAttribute("aria-expanded") === "true";
-  menuButton.setAttribute("aria-expanded", String(!isOpen));
-  menuButton.setAttribute("aria-label", isOpen ? "Abrir menú" : "Cerrar menú");
-  navigation.classList.toggle("open");
-  document.body.classList.toggle("menu-open");
+  setMenuState(!isOpen);
 });
 
 navigation.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+
+document.addEventListener("click", (event) => {
+  const menuIsOpen = menuButton.getAttribute("aria-expanded") === "true";
+  const clickInsideMenu = navigation.contains(event.target) || menuButton.contains(event.target);
+  if (menuIsOpen && !clickInsideMenu) closeMenu();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeMenu();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 760) closeMenu();
+});
 
 window.addEventListener("scroll", () => {
   header.classList.toggle("scrolled", window.scrollY > 60);
